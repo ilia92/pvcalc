@@ -131,7 +131,7 @@ def format_json_output(data):
     if isinstance(data, dict):
         return json.dumps({
             'timestamp': data['timestamp'].strftime('%Y-%m-%d %H:%M %Z'),
-            'dc_power_kw': round(data['dc_power_kw'], 2),
+            'dc_power_watts': round(data['dc_power_kw'] * 1000, 2),
             'poa_irradiance': round(data['poa_irradiance'], 2),
             'ghi': round(data['ghi'], 2)
         }, indent=2)
@@ -141,7 +141,7 @@ def format_json_output(data):
         for entry in data:
             formatted_data.append({
                 'timestamp': entry['timestamp'].strftime('%Y-%m-%d %H:%M %Z'),
-                'dc_power_kw': round(entry['dc_power_kw'], 2),
+                'dc_power_watts': round(entry['dc_power_kw'] * 1000, 2),
                 'poa_irradiance': round(entry['poa_irradiance'], 2),
                 'ghi': round(entry['ghi'], 2)
             })
@@ -163,11 +163,14 @@ def format_prometheus_output(data, args):
     location_labels = '{' + ','.join(labels) + '}'
     
     if isinstance(data, dict):
-        return f'theoretical_pv_kw{location_labels} {data["dc_power_kw"]:.2f}'
+        # Convert kW to W for Prometheus output
+        watts = data["dc_power_kw"] * 1000
+        return f'theoretical_pv_watts{location_labels} {watts:.2f}'
     else:
         # For timeframe data, only output the latest values
         latest = data[-1]
-        return f'theoretical_pv_kw{location_labels} {latest["dc_power_kw"]:.2f}'
+        watts = latest["dc_power_kw"] * 1000
+        return f'theoretical_pv_watts{location_labels} {watts:.2f}'
 
 def main():
     args = parse_arguments()
