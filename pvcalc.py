@@ -149,16 +149,21 @@ def format_json_output(data):
 
 def format_prometheus_output(data, args):
     """Format data as Prometheus metrics"""
-    labels = [
-        f'latitude="{args.latitude}"',
-        f'longitude="{args.longitude}"',
-        f'capacity="{args.system_capacity}"',
-        f'tilt="{args.panel_tilt}"',
-        f'azimuth="{args.panel_azimuth}"'
-    ]
+    labels = []
     
+    # Add shortname first if provided
     if args.shortname:
         labels.append(f'shortname="{args.shortname}"')
+    
+    # Add remaining labels
+    labels.extend([
+        f'plant="theoretical"',
+#        f'latitude="{args.latitude}"',
+#        f'longitude="{args.longitude}"',
+        f'capacity="{args.system_capacity}"',
+#        f'tilt="{args.panel_tilt}"',
+#        f'azimuth="{args.panel_azimuth}"'
+    ])
     
     location_labels = '{' + ','.join(labels) + '}'
     
